@@ -1,0 +1,94 @@
+diff --git a/src/thread.cpp b/src/thread.cpp
+index d767268..cb186a2 100644
+--- a/src/thread.cpp
++++ b/src/thread.cpp
+@@ -57,8 +57,14 @@ Thread::Thread(Search::SharedState&                    sharedState,
+     totalNuma(totalNumaCount),
+     nthreads(sharedState.options["Threads"]),
+     stdThread(
+-      create_native_thread(NativeThreadOptions{}.setLargeStack(true), &Thread::idle_loop, this)) {
+-
++#ifdef STOCKFISH_SINGLE_THREAD
++      NativeThread{}
++#else
++      create_native_thread(NativeThreadOptions{}.setLargeStack(true), &Thread::idle_loop, this)
++#endif
++      ) {
++
++#ifndef STOCKFISH_SINGLE_THREAD
+     if (!stdThread.joinable())
+     {
+         std::cerr << "Failed to create search thread\n";
+@@ -66,6 +72,7 @@ Thread::Thread(Search::SharedState&                    sharedState,
+     }
+ 
+     wait_for_search_finished();
++#endif
+ 
+     run_custom_job([this, &binder, &sharedState, &sm, n]() {
+         // Use the binder to [maybe] bind the threads to a NUMA node before doing
+@@ -76,7 +83,9 @@ Thread::Thread(Search::SharedState&                    sharedState,
+           sharedState, std::move(sm), n, idxInNuma, totalNuma, this->numaAccessToken);
+     });
+ 
++#ifndef STOCKFISH_SINGLE_THREAD
+     wait_for_search_finished();
++#endif
+ }
+ 
+ 
+@@ -86,9 +95,11 @@ Thread::~Thread() {
+ 
+     assert(!searching);
+ 
++#ifndef STOCKFISH_SINGLE_THREAD
+     exit = true;
+     start_searching();
+     stdThread.join();
++#endif
+ }
+ 
+ // Wakes up the thread that will start the search
+@@ -106,12 +117,19 @@ void Thread::clear_worker() {
+ // Blocks on the condition variable until the thread has finished searching
+ void Thread::wait_for_search_finished() {
+ 
++#ifdef STOCKFISH_SINGLE_THREAD
++    return;
++#else
+     std::unique_lock<std::mutex> lk(mutex);
+     cv.wait(lk, [&] { return !searching; });
++#endif
+ }
+ 
+ // Launching a function in the thread
+ void Thread::run_custom_job(std::function<void()> f) {
++#ifdef STOCKFISH_SINGLE_THREAD
++    f();
++#else
+     {
+         std::unique_lock<std::mutex> lk(mutex);
+         cv.wait(lk, [&] { return !searching; });
+@@ -119,6 +137,7 @@ void Thread::run_custom_job(std::function<void()> f) {
+         searching = true;
+     }
+     cv.notify_one();
++#endif
+ }
+ 
+ void Thread::ensure_network_replicated() { worker->ensure_network_replicated(); }
+diff --git a/src/Makefile b/src/Makefile
+index 667d4d9..a3d3f7e 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -894,7 +894,6 @@ endif
+ 
+ ifeq ($(arch),wasm32)
+-	CXXFLAGS += -pthread -msimd128 -DUSE_POPCNT -DNNUE_EMBEDDING_OFF -DUSE_SLOPPY_ATOMICS
+-	LDFLAGS += -pthread -sINITIAL_MEMORY=64MB -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=3MB \
+-		-sPTHREAD_POOL_SIZE=4 -sPTHREAD_POOL_SIZE_STRICT=0 \
++	CXXFLAGS += -msimd128 -DUSE_POPCNT -DNNUE_EMBEDDING_OFF -DUSE_SLOPPY_ATOMICS -DSTOCKFISH_SINGLE_THREAD
++	LDFLAGS += -sINITIAL_MEMORY=64MB -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=3MB \
+ 		-sINVOKE_RUN=0 -sEXIT_RUNTIME=0 -sEXPORTED_FUNCTIONS=_uci_command,_main \
+ 		-sEXPORTED_RUNTIME_METHODS=FS,ccall
+ 	ifeq ($(relaxedsimd),yes)

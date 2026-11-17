@@ -1,0 +1,945 @@
+:root {
+  color-scheme: light dark;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  line-height: 1.5;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background: Canvas;
+  color: CanvasText;
+}
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: min(100%, 1240px);
+  margin: 0 auto;
+  padding: 1.25rem;
+}
+
+.app-shell > :empty {
+  display: none;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 22.5rem);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.board-column {
+  display: grid;
+  min-width: 0;
+  gap: 0.75rem;
+}
+
+.board-stage {
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+  gap: 0.6rem;
+  align-items: stretch;
+  width: min(100%, calc(72vh + 2.85rem));
+  margin: 0 auto;
+}
+
+.board-stage[data-variant='xiangqi'] {
+  width: min(100%, calc(64.8vh + 2.85rem));
+}
+
+.eval-host {
+  display: flex;
+  min-width: 0;
+}
+
+.side-column {
+  display: grid;
+  grid-template-rows: minmax(0, 14rem) minmax(0, 1fr);
+  align-content: stretch;
+  min-width: 0;
+  height: calc(100vh - 7rem);
+  gap: 0.75rem;
+  position: sticky;
+  top: 1rem;
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+
+.analysis-host,
+.moves-host {
+  min-height: 0;
+  overflow: auto;
+  scrollbar-gutter: stable;
+}
+
+.app-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  letter-spacing: 0.08em;
+}
+
+.app-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.app-controls button {
+  min-height: 2.25rem;
+  padding: 0.35rem 0.8rem;
+  border: 1px solid color-mix(in srgb, CanvasText 22%, transparent);
+  border-radius: 0.35rem;
+  background: color-mix(in srgb, CanvasText 6%, Canvas);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.app-controls button[aria-pressed='true'] {
+  border-color: color-mix(in srgb, CanvasText 55%, transparent);
+  background: color-mix(in srgb, CanvasText 16%, Canvas);
+}
+
+.app-controls .app-legal {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: 0.35rem 0.6rem;
+  color: inherit;
+  font-size: 0.9rem;
+  text-underline-offset: 0.2em;
+}
+
+.app-controls button:focus-visible {
+  outline: 2px solid Highlight;
+  outline-offset: 2px;
+}
+
+.app-controls label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.25rem;
+  padding-left: 0.35rem;
+  color: color-mix(in srgb, CanvasText 70%, transparent);
+  font-size: 0.85rem;
+}
+
+.app-controls select {
+  min-height: 2.25rem;
+  padding: 0.25rem 0.4rem;
+  border: 1px solid color-mix(in srgb, CanvasText 22%, transparent);
+  border-radius: 0.35rem;
+  background: color-mix(in srgb, CanvasText 6%, Canvas);
+  color: inherit;
+  font: inherit;
+}
+
+.board-host {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+.app-status {
+  margin: 0;
+  text-align: center;
+  opacity: 0.65;
+}
+
+.moves-host {
+  width: 100%;
+  margin: 0;
+}
+
+.move-panel {
+  display: grid;
+  min-width: 0;
+  gap: 0.5rem;
+  padding: 0.6rem;
+  border: 1px solid color-mix(in srgb, CanvasText 16%, transparent);
+  border-radius: 0.4rem;
+}
+
+.move-toolbar {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.move-toolbar button,
+.move-list button {
+  min-height: 2rem;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
+  border-radius: 0.3rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.move-toolbar button:hover,
+.move-list button:hover {
+  background: color-mix(in srgb, CanvasText 8%, transparent);
+}
+
+.move-list {
+  display: grid;
+  min-width: 0;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.move-list li {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.1rem;
+}
+
+.move-list .move-toggle {
+  width: 1.25rem;
+  min-height: 1.5rem;
+  padding: 0;
+  border: 0;
+  opacity: 0.7;
+}
+
+.move-list .move-toggle:disabled {
+  visibility: hidden;
+}
+
+.move-list .move-delete {
+  width: 1.1rem;
+  min-height: 1.5rem;
+  padding: 0;
+  border: 0;
+  opacity: 0.45;
+}
+
+.move-list .move-delete:hover {
+  opacity: 1;
+}
+
+.move-list button[aria-current='step'] {
+  border-color: color-mix(in srgb, CanvasText 55%, transparent);
+  background: color-mix(in srgb, CanvasText 16%, transparent);
+}
+
+.move-list li[data-variation='true'] button {
+  border-style: dashed;
+  opacity: 0.85;
+}
+
+.analysis-host {
+  width: 100%;
+  margin: 0;
+}
+
+.analysis-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0.45rem;
+  height: 100%;
+  min-height: 0;
+  padding: 0.6rem;
+  border: 1px solid color-mix(in srgb, CanvasText 16%, transparent);
+  border-radius: 0.4rem;
+  box-sizing: border-box;
+}
+
+.analysis-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+}
+
+.analysis-toolbar button {
+  min-height: 2rem;
+  padding: 0.2rem 0.65rem;
+  border: 1px solid color-mix(in srgb, CanvasText 22%, transparent);
+  border-radius: 0.3rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.analysis-toolbar span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.7;
+}
+
+.analysis-lines {
+  display: grid;
+  align-content: start;
+  min-height: 0;
+  gap: 0.2rem;
+  overflow: auto;
+  scrollbar-gutter: stable;
+  font:
+    0.82rem/1.4 ui-monospace,
+    SFMono-Regular,
+    Consolas,
+    monospace;
+  white-space: nowrap;
+}
+
+.analysis-panel--empty {
+  height: auto;
+  grid-template-rows: auto auto;
+}
+
+.analysis-line {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  min-width: 0;
+  gap: 0.35rem;
+}
+
+.analysis-preview {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-width: 0;
+  gap: 0.35rem;
+}
+
+.analysis-line > span {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.eval-bar {
+  position: relative;
+  height: 0.85rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, CanvasText 18%, transparent);
+  border-radius: 0.2rem;
+  background: color-mix(in srgb, CanvasText 82%, Canvas);
+}
+
+.eval-rail {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border-radius: 0.35rem;
+  border-color: color-mix(in srgb, CanvasText 28%, transparent);
+  background: #1a1a1a;
+}
+
+.eval-rail__top,
+.eval-rail__bottom {
+  flex: 0 0 auto;
+  transition: height 120ms linear;
+}
+
+.eval-rail__top {
+  background: #1a1a1a;
+}
+
+.eval-rail__bottom {
+  margin-top: auto;
+  background: #fafafa;
+}
+
+.eval-rail--xiangqi .eval-rail__bottom {
+  background: #c62828;
+}
+
+.eval-rail--flipped .eval-rail__top {
+  background: #fafafa;
+}
+
+.eval-rail--flipped .eval-rail__bottom {
+  background: #1a1a1a;
+}
+
+.eval-rail--xiangqi.eval-rail--flipped .eval-rail__top {
+  background: #c62828;
+}
+
+.eval-rail--pending {
+  opacity: 0;
+}
+
+.eval-rail--pending .eval-rail__top,
+.eval-rail--pending .eval-rail__bottom {
+  background: #6b7280;
+}
+
+.eval-rail__top-label,
+.eval-rail__bottom-label,
+.eval-rail__score {
+  position: absolute;
+  left: 50%;
+  z-index: 1;
+  transform: translateX(-50%);
+  font:
+    600 0.55rem/1 ui-monospace,
+    Consolas,
+    monospace;
+  pointer-events: none;
+}
+
+.eval-rail__top-label,
+.eval-rail__bottom-label {
+  padding: 0.05rem 0.1rem;
+  border-radius: 0.15rem;
+  background: rgb(0 0 0 / 55%);
+  color: #fff;
+}
+
+.eval-rail__top-label {
+  top: 0.2rem;
+}
+
+.eval-rail__bottom-label {
+  bottom: 0.2rem;
+}
+
+.eval-rail__score {
+  top: 50%;
+  padding: 0.1rem 0.2rem;
+  border-radius: 0.15rem;
+  background: color-mix(in srgb, Canvas 82%, transparent);
+  color: CanvasText;
+  transform: translate(-50%, -50%);
+}
+
+.analysis-line button,
+.analysis-preview button {
+  min-height: 1.6rem;
+  padding: 0.1rem 0.45rem;
+  border: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
+  border-radius: 0.25rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.analysis-preview {
+  opacity: 0.85;
+}
+
+.board-arrow {
+  stroke: #3b82f6;
+  stroke-width: 10;
+  stroke-linecap: round;
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.board-arrowhead {
+  fill: #3b82f6;
+  opacity: 0.72;
+}
+
+.promotion {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  background: rgb(0 0 0 / 55%);
+}
+
+.settings-dialog {
+  display: grid;
+  gap: 0.65rem;
+  width: min(100%, 26rem);
+  padding: 0.85rem;
+  border: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
+  border-radius: 0.45rem;
+  background: Canvas;
+}
+
+.settings-dialog h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.settings-dialog h3 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.settings-engine {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.settings-engine label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+}
+
+.settings-engine select {
+  min-height: 2rem;
+  padding: 0.2rem 0.35rem;
+  border: 1px solid color-mix(in srgb, CanvasText 22%, transparent);
+  border-radius: 0.3rem;
+  background: Canvas;
+  color: inherit;
+  font: inherit;
+}
+
+.settings-general {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid color-mix(in srgb, CanvasText 14%, transparent);
+}
+
+.settings-general label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+}
+
+.settings-general select,
+.settings-general button {
+  min-height: 2rem;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid color-mix(in srgb, CanvasText 22%, transparent);
+  border-radius: 0.3rem;
+  background: Canvas;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.settings-general .app-legal {
+  color: inherit;
+  font-size: 0.9rem;
+  text-underline-offset: 0.2em;
+}
+
+.settings-networks {
+  display: grid;
+  gap: 0.25rem;
+  max-height: 9rem;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+  font-size: 0.82rem;
+}
+
+.settings-networks li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.settings-networks button {
+  min-height: 1.6rem;
+  padding: 0.1rem 0.45rem;
+  border: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
+  border-radius: 0.25rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.settings-facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 0.75rem;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.settings-facts dd {
+  margin: 0;
+  text-align: right;
+}
+
+.settings-message {
+  min-height: 1.2rem;
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.settings-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+.settings-actions button {
+  min-height: 2rem;
+  padding: 0.25rem 0.8rem;
+  border: 1px solid color-mix(in srgb, CanvasText 22%, transparent);
+  border-radius: 0.3rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.promotion__dialog {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 18rem;
+  padding: 1rem;
+  border: 1px solid color-mix(in srgb, CanvasText 22%, transparent);
+  border-radius: 0.5rem;
+  background: Canvas;
+  color: CanvasText;
+  box-shadow: 0 1rem 3rem rgb(0 0 0 / 35%);
+}
+
+.promotion__dialog p {
+  margin: 0;
+  font-weight: 600;
+  text-align: center;
+}
+
+.promotion__options {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.promotion__options button {
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  padding: 0.25rem;
+  border: 1px solid color-mix(in srgb, CanvasText 22%, transparent);
+  border-radius: 0.4rem;
+  background: color-mix(in srgb, CanvasText 6%, Canvas);
+  cursor: pointer;
+}
+
+.promotion__options button:hover,
+.promotion__options button:focus-visible {
+  border-color: color-mix(in srgb, CanvasText 55%, transparent);
+  outline: 2px solid Highlight;
+  outline-offset: 1px;
+}
+
+.promotion__piece {
+  width: 3.5rem;
+  height: 3.5rem;
+  color: #fafafa;
+  --piece-stroke: #1a1a1a;
+}
+
+.promotion__cancel {
+  justify-self: center;
+  min-height: 2rem;
+  padding: 0.25rem 0.8rem;
+  border: 1px solid color-mix(in srgb, CanvasText 22%, transparent);
+  border-radius: 0.35rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 55%);
+}
+
+.modal__dialog {
+  display: grid;
+  gap: 0.65rem;
+  width: min(100%, 44rem);
+  padding: 1rem;
+  border: 1px solid color-mix(in srgb, CanvasText 22%, transparent);
+  border-radius: 0.5rem;
+  background: Canvas;
+  color: CanvasText;
+  box-shadow: 0 1rem 3rem rgb(0 0 0 / 35%);
+}
+
+.modal__dialog p {
+  margin: 0;
+}
+
+.modal__textarea {
+  width: 100%;
+  min-height: 5.5rem;
+  padding: 0.5rem;
+  border: 1px solid color-mix(in srgb, CanvasText 22%, transparent);
+  border-radius: 0.35rem;
+  background: color-mix(in srgb, CanvasText 5%, Canvas);
+  color: inherit;
+  font:
+    0.9rem/1.5 ui-monospace,
+    SFMono-Regular,
+    Consolas,
+    monospace;
+  resize: vertical;
+}
+
+.modal__textarea:focus-visible {
+  outline: 2px solid Highlight;
+  outline-offset: 1px;
+}
+
+.modal__error {
+  min-height: 1.2rem;
+  color: #ff8a80;
+  font-size: 0.85rem;
+}
+
+.modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+.modal__actions button {
+  min-height: 2rem;
+  padding: 0.25rem 0.8rem;
+  border: 1px solid color-mix(in srgb, CanvasText 22%, transparent);
+  border-radius: 0.35rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.editor__dialog {
+  width: min(100%, 70rem);
+}
+
+.editor__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 17rem;
+  gap: 1rem;
+  align-items: start;
+}
+
+.editor__board {
+  min-width: 0;
+}
+
+.editor__side {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.editor__palette {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.3rem;
+}
+
+.editor__palette-button {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  padding: 0.15rem;
+  border: 1px solid color-mix(in srgb, CanvasText 18%, transparent);
+  border-radius: 0.3rem;
+  background: transparent;
+  cursor: pointer;
+}
+
+.editor__palette-button[aria-pressed='true'] {
+  border-color: color-mix(in srgb, CanvasText 60%, transparent);
+  background: color-mix(in srgb, CanvasText 12%, transparent);
+}
+
+.editor__palette-piece {
+  width: 100%;
+  height: 100%;
+  color: #fafafa;
+  --piece-stroke: #1a1a1a;
+}
+
+.editor__palette-button[data-piece^='b'] .editor__palette-piece {
+  color: #1a1a1a;
+  --piece-stroke: #fafafa;
+}
+
+.editor__actions {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.editor__actions button {
+  min-height: 2rem;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
+  border-radius: 0.3rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.editor__controls {
+  display: grid;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+}
+
+.editor__controls label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.editor__controls input[type='number'],
+.editor__controls input[type='text'],
+.editor__controls select {
+  width: 5rem;
+  min-height: 1.8rem;
+  border: 1px solid color-mix(in srgb, CanvasText 22%, transparent);
+  border-radius: 0.25rem;
+  background: color-mix(in srgb, CanvasText 5%, Canvas);
+  color: inherit;
+  font: inherit;
+}
+
+.editor__fieldset {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 0.85rem;
+}
+
+.editor__fieldset legend {
+  width: 100%;
+  padding: 0;
+}
+
+.editor__fieldset label {
+  justify-content: flex-start;
+}
+
+@media (max-width: 980px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .side-column {
+    position: static;
+    height: auto;
+    max-height: none;
+    grid-template-rows: auto auto;
+    overflow: visible;
+  }
+
+  .analysis-host,
+  .moves-host {
+    overflow: visible;
+  }
+
+  .analysis-panel {
+    height: auto;
+    grid-template-rows: auto auto;
+  }
+
+  .analysis-lines {
+    overflow: visible;
+  }
+}
+
+@media (max-width: 760px) {
+  .editor__body {
+    grid-template-columns: 1fr;
+  }
+
+  .editor__palette {
+    grid-template-columns: repeat(7, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+
+  .board-host,
+  .analysis-host {
+    width: 100%;
+  }
+
+  .app-controls {
+    width: 100%;
+  }
+
+  .app-controls button,
+  .app-controls select {
+    flex: 1 1 auto;
+  }
+
+  .analysis-toolbar {
+    align-items: stretch;
+  }
+}

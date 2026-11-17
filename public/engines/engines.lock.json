@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-11-16T13:42:36.928Z",
+  "toolchain": {
+    "emsdkCommit": "d7b4130688bfa348392b921ab04015aa15c4f154",
+    "emscriptenVersion": "6.0.13",
+    "emscriptenCommit": "e13ee988ce3d87a738dd8f3661d02223308c412a",
+    "make": "GNU Make 4.4.1 (w64devkit)",
+    "sevenZip": "7zip-bin 5.2.0"
+  },
+  "engines": {
+    "stockfish": {
+      "source": "https://github.com/official-stockfish/Stockfish",
+      "commit": "edb0d9db6731067ec50ce619ff372b463bc4dd5d",
+      "version": "sf_19",
+      "license": "GPL-3.0-or-later",
+      "patch": "tools/patches/stockfish-wasm-bridge.patch",
+      "builds": {
+        "threads-simd": {
+          "baseUrl": "/engines/stockfish/sf_19/threads-simd/",
+          "command": "make -C tools/src/stockfish/src -j4 ARCH=wasm32 COMP=clang clangmajorversion=20 build",
+          "artifacts": [
+            {
+              "path": "stockfish.js",
+              "bytes": 80094,
+              "sha256": "1B1AA7916ED1DBAF7FD9B8E66C033C068B16F8168675A5E1E37507BA58749868"
+            },
+            {
+              "path": "stockfish.wasm",
+              "bytes": 732516,
+              "sha256": "04AF277C2EB44C487A8DE203306AB0ED6874C97E424F0D2FB38517C8E2B9537E"
+            }
+          ]
+        },
+        "single-simd": {
+          "baseUrl": "/engines/stockfish/sf_19/single-simd/",
+          "command": "make -C tools/src/stockfish/src clean && make -C tools/src/stockfish/src -j4 ARCH=wasm32 COMP=clang clangmajorversion=20 build",
+          "artifacts": [
+            {
+              "path": "stockfish.js",
+              "bytes": 62563,
+              "sha256": "0287613821FCFF1CB01E7355B74247F3731F165B80ACBBE8844E26E42373FBC6"
+            },
+            {
+              "path": "stockfish.wasm",
+              "bytes": 678192,
+              "sha256": "F1E67E2509C4FFC218931B45890D2173D8D4EDB903372589E81BD3ADA2EB2423"
+            }
+          ]
+        }
+      },
+      "networks": [
+        {
+          "option": "EvalFile",
+          "file": "nn-1a298aa575a0.nnue",
+          "url": "/engines/stockfish/sf_19/nets/nn-1a298aa575a0.nnue",
+          "bytes": 98511183,
+          "sha256": "1a298aa575a085434d29027978dc36867fe9c5bcea9376654b7a8eba1e52dfc2",
+          "license": "CC0-1.0"
+        }
+      ]
+    },
+    "pikafish": {
+      "source": "https://github.com/official-pikafish/Pikafish",
+      "commit": "4c17cee11f888ae1d48a9494f2e2239f019f0a1f",
+      "version": "Pikafish-2026-09-06",
+      "license": "GPL-3.0",
+      "patch": "tools/patches/pikafish-wasm-bridge.patch",
+      "builds": {
+        "threads-simd": {
+          "baseUrl": "/engines/pikafish/Pikafish-2026-09-06/threads-simd/",
+          "command": "make -C tools/src/pikafish/src -j4 ARCH=wasm32 COMP=clang clangmajorversion=20 GIT_SHA=4c17cee1 GIT_DATE=20260906 GIT_DIFFINDEX= build",
+          "artifacts": [
+            {
+              "path": "pikafish.js",
+              "bytes": 79549,
+              "sha256": "69EE79590C5403AD402DC2E0141AF3E08AFDEF3797F3A67B76078BB1BEB18630"
+            },
+            {
+              "path": "pikafish.wasm",
+              "bytes": 669663,
+              "sha256": "5552D1DD98E0A5A287414EE2B10666D07D46B04D1CB300D6F1386075EFE2C4CA"
+            }
+          ]
+        },
+        "single-simd": {
+          "baseUrl": "/engines/pikafish/Pikafish-2026-09-06/single-simd/",
+          "command": "make -C tools/src/pikafish/src clean && make -C tools/src/pikafish/src -j4 ARCH=wasm32 COMP=clang clangmajorversion=20 GIT_SHA=4c17cee1 GIT_DATE=20260906 GIT_DIFFINDEX= build",
+          "artifacts": [
+            {
+              "path": "pikafish.js",
+              "bytes": 61893,
+              "sha256": "32503CA637EB74874AEF41E3395E83BA5917CFD24C40FCBE4035B61A4E4D268F"
+            },
+            {
+              "path": "pikafish.wasm",
+              "bytes": 615241,
+              "sha256": "BB6790E7C56642648B4791A5489E2D6D706C1F0FAAA81648025E1F428E19A3EB"
+            }
+          ]
+        }
+      },
+      "networks": [
+        {
+          "option": "EvalFile",
+          "file": "pikafish.nnue",
+          "url": "/engines/pikafish/Pikafish-2026-09-06/nets/pikafish.nnue",
+          "bytes": 50706378,
+          "sha256": "7d13d73569a9b571ba0eb20cf1596247bc2a42738967e61afef6482b231e900e",
+          "license": "Pikafish NNUE License (non-commercial)"
+        }
+      ]
+    }
+  }
+}

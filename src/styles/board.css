@@ -1,0 +1,147 @@
+:root {
+  --board-light: #f0d9b5;
+  --board-dark: #b58863;
+  --board-surface: #f0d9b5;
+  --board-border: #5a3e25;
+  --board-line: #5a3e25;
+  --board-coord: #5a3e25;
+}
+
+[data-board-theme='green'] {
+  --board-light: #eeeed2;
+  --board-dark: #769656;
+  --board-surface: #eeeed2;
+  --board-border: #3f542c;
+  --board-line: #3f542c;
+  --board-coord: #3f542c;
+}
+
+[data-board-theme='blue'] {
+  --board-light: #dee3e6;
+  --board-dark: #8ca2ad;
+  --board-surface: #dee3e6;
+  --board-border: #35444c;
+  --board-line: #35444c;
+  --board-coord: #35444c;
+}
+
+[data-board-theme='contrast'] {
+  --board-light: #ffffff;
+  --board-dark: #3f3f3f;
+  --board-surface: #ffffff;
+  --board-border: #000000;
+  --board-line: #000000;
+  --board-coord: #000000;
+}
+
+.board-surface {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  touch-action: none;
+}
+
+.board-square--light {
+  fill: var(--board-light);
+}
+
+.board-square--dark {
+  fill: var(--board-dark);
+}
+
+.board-frame {
+  fill: var(--board-light);
+}
+
+.board-field {
+  fill: var(--board-surface);
+}
+
+.board-border {
+  fill: none;
+  stroke: var(--board-border);
+  stroke-width: 4;
+}
+
+.board-line {
+  stroke: var(--board-line);
+  stroke-width: 2;
+  stroke-linecap: square;
+}
+
+.board-coord {
+  fill: var(--board-coord);
+  font-size: 16px;
+  font-weight: 600;
+  user-select: none;
+}
+
+.board-hit {
+  fill: transparent;
+  stroke: none;
+  pointer-events: all;
+}
+
+.board-last {
+  fill: color-mix(in srgb, var(--board-coord) 22%, transparent);
+  stroke: none;
+  pointer-events: none;
+}
+
+.board-target {
+  fill: color-mix(in srgb, var(--board-coord) 55%, transparent);
+  stroke: none;
+  pointer-events: none;
+}
+
+.board-surface--xiangqi .board-target {
+  fill: none;
+  stroke: color-mix(in srgb, var(--board-coord) 55%, transparent);
+  stroke-width: 4;
+}
+
+.board-selected {
+  fill: none;
+  stroke: #e0a526;
+  stroke-width: 4;
+  pointer-events: none;
+}
+
+.piece-sprites {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.piece {
+  pointer-events: none;
+}
+
+.piece--white {
+  color: #fafafa;
+  --piece-stroke: #1a1a1a;
+}
+
+.piece--black {
+  color: #1a1a1a;
+  --piece-stroke: #fafafa;
+  --piece-glyph: #f5e6c8;
+}
+
+.piece--red {
+  color: #c62828;
+  --piece-stroke: #5a1212;
+  --piece-glyph: #fff8e7;
+}
+
+[data-board-theme='contrast'] .piece--white {
+  color: #ffffff;
+  --piece-stroke: #000000;
+}
+
+[data-board-theme='contrast'] .piece--black {
+  color: #000000;
+  --piece-stroke: #ffffff;
+}

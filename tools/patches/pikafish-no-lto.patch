@@ -1,0 +1,15 @@
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -966,8 +966,12 @@
+ 	else ifeq ($(comp),mingw)
+ 		CXXFLAGS += -flto -flto-partition=one
+ 		LDFLAGS += $(CXXFLAGS) -save-temps
+ 	endif
++ifeq ($(arch),wasm32)
++	CXXFLAGS := $(filter-out -flto%,$(CXXFLAGS))
++	LDFLAGS := $(filter-out -flto%,$(LDFLAGS))
++endif
+ endif
+ endif
+ 
+ ### 3.10 Android 5 can only run position independent executables. Note that this

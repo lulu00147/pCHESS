@@ -1,0 +1,88 @@
+diff --git a/src/Makefile b/src/Makefile
+index 9f3ac94..d234644 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -60,10 +60,10 @@ else ifeq ($(COMP),mingw)
+ endif
+ 
+ ### Executable name
+-ifeq ($(target_windows),yes)
+-	EXE = pikafish.exe
+-else ifneq (,$(findstring wasm,$(ARCH)))
++ifneq (,$(findstring wasm,$(ARCH)))
+ 	EXE = pikafish.js
++else ifeq ($(target_windows),yes)
++	EXE = pikafish.exe
+ else
+ 	EXE = pikafish
+ endif
+@@ -76,7 +76,11 @@ BINDIR = $(PREFIX)/bin
+ PGOBENCH = $(RUN_PREFIX) ./$(EXE) bench
+ 
+ ### Source and object files
+-SRCS = $(shell find -L . \( -path './universal' -o -path './temp_builds' \) -prune -o \( -name '*.cpp' -o -name '*.S' \) -print | sed 's|^\./||')
++SRCS = $(shell find -L . \( -path './universal' -o -path './temp_builds' \) -prune -o \( -name '*.cpp' -o -name '*.S' \) -print | sed 's|^\./||' | grep -v '^wasm_bridge.cpp$$')
++
++ifneq (,$(findstring wasm,$(ARCH)))
++	SRCS += wasm_bridge.cpp
++endif
+ 
+ HEADERS = $(shell find -L . \( -path './universal' -o -path './temp_builds' \) -prune -o -name '*.h' -print | sed 's|^\./||')
+ 
+@@ -871,7 +875,10 @@ endif
+ 
+ ifeq ($(arch),wasm32)
+ 	CXXFLAGS += -pthread -msimd128 -DUSE_POPCNT -DUSE_SLOPPY_ATOMICS
+-	LDFLAGS += -pthread -sINITIAL_MEMORY=64MB -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=3MB
++	LDFLAGS += -pthread -sINITIAL_MEMORY=64MB -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=3MB \
++		-sPTHREAD_POOL_SIZE=4 -sPTHREAD_POOL_SIZE_STRICT=0 \
++		-sINVOKE_RUN=0 -sEXIT_RUNTIME=0 -sEXPORTED_FUNCTIONS=_uci_command,_main \
++		-sEXPORTED_RUNTIME_METHODS=FS,ccall
+ 	ifeq ($(relaxedsimd),yes)
+ 		CXXFLAGS += -mrelaxed-simd
+ 	endif
+diff --git a/src/wasm_bridge.cpp b/src/wasm_bridge.cpp
+new file mode 100644
+index 0000000..ebedab3
+--- /dev/null
++++ b/src/wasm_bridge.cpp
+@@ -0,0 +1,39 @@
++#include <emscripten.h>
++
++#include <memory>
++#include <string>
++
++#include "attacks.h"
++#include "misc.h"
++#include "position.h"
++#include "tune.h"
++#include "uci.h"
++
++using namespace Stockfish;
++
++namespace {
++
++std::unique_ptr<UCIEngine> g_engine;
++std::string                g_command;
++char                       g_arg0[] = "pikafish";
++char*                      g_argv[] = {g_arg0, nullptr};
++
++}  // namespace
++
++// Bridge for browser-side UCI command dispatch.
++extern "C" void uci_command(const char* command);
++
++extern "C" EMSCRIPTEN_KEEPALIVE void uci_command(const char* command) {
++    g_command = command ? command : "";
++    g_argv[1] = g_command.data();
++
++    if (!g_engine)
++    {
++        Attacks::init();
++        Position::init();
++        g_engine = std::make_unique<UCIEngine>(CommandLine(2, g_argv));
++        Tune::init(g_engine->engine_options());
++    }
++
++    g_engine->loop();
++}
