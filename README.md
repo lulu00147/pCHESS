@@ -86,7 +86,8 @@ flowchart TD
   nHandle --> nGate["acceptEngineMessage"]
   nGate --> nState["AnalysisState.info / finish"]
   nState --> nEval
-  nHandle -->|bestmove, reply| nCommit["session.commitLine"]
+  nHandle --> nReply["bestmove, reply"]
+  nReply --> nCommit["session.commitLine"]
   nCommit --> nTree
 
   nStart --> nSave["scheduleSave → GamePersistence.persist → putGame"]
