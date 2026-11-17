@@ -68,30 +68,30 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-  input["pointer / keyboard"] --> click["BoardSession.click"]
-  click --> branch["clickChess / clickXiangqi"]
-  branch --> record["recordChess / recordXiangqi"]
-  record --> tree["GameTree"]
-  tree --> render["AppShell.render"]
-  render --> view["session.view / describe / treeView"]
-  render --> board["createBoardSurface"]
-  render --> moves["renderMoveTree"]
-  render --> eval["renderEval → resolveEvaluation → renderEvalRail"]
+  nInput["pointer / keyboard"] --> nClick["BoardSession.click"]
+  nClick --> nBranch["clickChess / clickXiangqi"]
+  nBranch --> nRecord["recordChess / recordXiangqi"]
+  nRecord --> nTree["GameTree"]
+  nTree --> nRender["AppShell.render"]
+  nRender --> nView["session.view / describe / treeView"]
+  nRender --> nBoard["createBoardSurface"]
+  nRender --> nMoves["renderMoveTree"]
+  nRender --> nEval["renderEval → resolveEvaluation → renderEvalRail"]
 
-  start["AnalysisView.onStart"] --> analyze["analyzeCurrent"]
-  analyze --> create["createEngineSession"]
-  analyze --> send["EngineClient.analyze"]
-  send --> uci["Worker / UCI"]
-  uci --> handle["handleEngineMessage"]
-  handle --> gate["acceptEngineMessage"]
-  gate --> state["AnalysisState.info / finish"]
-  state --> eval
-  handle -->|bestmove, reply| commit["session.commitLine"]
-  commit --> tree
+  nStart["AnalysisView.onStart"] --> nAnalyze["analyzeCurrent"]
+  nAnalyze --> nCreate["createEngineSession"]
+  nAnalyze --> nSend["EngineClient.analyze"]
+  nSend --> nUci["Worker / UCI"]
+  nUci --> nHandle["handleEngineMessage"]
+  nHandle --> nGate["acceptEngineMessage"]
+  nGate --> nState["AnalysisState.info / finish"]
+  nState --> nEval
+  nHandle -->|bestmove, reply| nCommit["session.commitLine"]
+  nCommit --> nTree
 
-  start --> save["scheduleSave → GamePersistence.persist → putGame"]
-  restore["restorePersisted"] --> load["GamePersistence.restore → getGame / restoreTree"]
-  load --> tree
+  nStart --> nSave["scheduleSave → GamePersistence.persist → putGame"]
+  nRestore["restorePersisted"] --> nLoad["GamePersistence.restore → getGame / restoreTree"]
+  nLoad --> nTree
 ```
 
 ## 构建
